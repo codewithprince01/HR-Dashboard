@@ -2,9 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { connectToDatabase } = require("./src/db");
+const path = require('path');
 require("dotenv").config();
 
 const userRouter = require("./src/routes/user.routes");
+const hrRoutes = require('./src/routes/hr.routes');
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -24,9 +26,11 @@ app.use(
 app.use(express.json());
 app.use(cookieParser()); // Parse cookies
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use("/api/users", userRouter);
+app.use('/api', hrRoutes);
 
 // Database connection
 connectToDatabase()
