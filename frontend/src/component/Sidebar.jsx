@@ -1,103 +1,89 @@
-// Sidebar.jsx
 import React from 'react';
 import { FaUser, FaClock, FaCalendarAlt, FaSignOutAlt, FaSearch, FaUsers } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
+import '../style/sidebar.css';
 
 const Sidebar = () => {
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg border-r border-gray-200 flex flex-col">
+    <div className="sidebar">
       {/* Logo Section */}
-      <div className="flex items-center p-4">
-        <div className="w-8 h-8 bg-[#4d007d] flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-white"></div>
+      <div className="logo-section">
+        <div className="logo-icon">
+          <div className="logo-inner-box"></div>
         </div>
-        <span className="ml-2 text-[#4d007d] font-bold text-lg">LOGO</span>
+        <span className="logo-text">LOGO</span>
       </div>
 
       {/* Search Bar */}
-      <div className="px-4 py-2">
-        <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+      <div className="search-bar">
+        <div className="search-wrapper">
+          <FaSearch className="search-icon" />
           <input
             type="text"
             placeholder="Search"
-            className="w-full pl-10 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#4d007d]"
+            className="search-input"
           />
         </div>
       </div>
 
       {/* Menu Items */}
-      <nav className="flex-1 mt-4">
-        <ul className="space-y-2">
-          <li className="px-4 py-2 text-gray-400 text-sm">
-            Recruitment
-          </li>
-          
-          <li className="px-4 py-2 text-[#4d007d] font-medium flex items-center">
-          <NavLink
+      <nav className="menu">
+        <ul className="menu-list">
+          <li className="section-label">Recruitment</li>
+          <li className="menu-item">
+            <NavLink
               to="/candidates"
               className={({ isActive }) =>
-                `flex items-center px-2 py-2 rounded-md ${
-                  isActive
-                    ? 'text-[#4d007d] font-medium'
-                    : 'text-gray-600 hover:text-[#4d007d]'
-                }`
+                `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="mr-3 w-5 h-5" /> Candidates
+              <FaUser className="menu-icon" /> Candidates
             </NavLink>
           </li>
 
-          <li className="px-4 py-2 text-gray-400 text-sm mt-6">
-            Organization
-          </li>
-          <li className="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-[#4d007d] flex items-center">
-          <NavLink
+          <li className="section-label">Organization</li>
+          <li className="menu-item">
+            <NavLink
               to="/employees"
               className={({ isActive }) =>
-                `flex items-center px-2 py-2 rounded-md ${
-                  isActive
-                    ? 'text-[#4d007d] font-medium'
-                    : 'text-gray-600 hover:text-[#4d007d]'
-                }`
+                `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="mr-3 w-5 h-5" /> Employees
+              <FaUser className="menu-icon" /> Employees
             </NavLink>
           </li>
-          <li className="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-[#4d007d] flex items-center">
-          <NavLink
+          <li className="menu-item">
+            <NavLink
               to="/attendence"
               className={({ isActive }) =>
-                `flex items-center px-2 py-2 rounded-md ${
-                  isActive
-                    ? 'text-[#4d007d] font-medium'
-                    : 'text-gray-600 hover:text-[#4d007d]'
-                }`
+                `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="mr-3 w-5 h-5" /> Attendence
-            </NavLink>          </li>
-          <li className="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-[#4d007d] flex items-center">
-          <NavLink
+              <FaUser className="menu-icon" /> Attendence
+            </NavLink>
+          </li>
+          <li className="menu-item">
+            <NavLink
               to="/leaves"
               className={({ isActive }) =>
-                `flex items-center px-2 py-2 rounded-md ${
-                  isActive
-                    ? 'text-[#4d007d] font-medium'
-                    : 'text-gray-600 hover:text-[#4d007d]'
-                }`
+                `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="mr-3 w-5 h-5" /> Leaves
-            </NavLink> 
+              <FaUser className="menu-icon" /> Leaves
+            </NavLink>
           </li>
-          
-          <li className="px-4 py-2 text-gray-400 text-sm mt-6">
-            Others
-          </li>
-          <li className="px-4 py-2 text-gray-600 hover:bg-gray-100 hover:text-[#4d007d] flex items-center">
-            <FaSignOutAlt className="mr-3 w-5 h-5 text-gray-400" /> Logout
+
+          <li className="section-label">Others</li>
+          <li className="menu-item logout">
+          <NavLink
+              to="/logout"
+              className={({ isActive }) =>
+                `menu-link ${isActive ? 'active' : ''}`
+              }
+            >
+             <FaSignOutAlt className="menu-icon text-gray-400" />  Logout
+            </NavLink>
+            
           </li>
         </ul>
       </nav>

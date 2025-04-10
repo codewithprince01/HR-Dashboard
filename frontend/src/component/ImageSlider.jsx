@@ -6,6 +6,74 @@ const images = [
   "/slider/slider3.jpeg",
 ];
 
+const sliderContainerStyle = {
+  backgroundColor: '#6B21A8',
+  color: 'white',
+  padding: '2rem',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  height: '100%',
+};
+
+const sliderWrapperStyle = {
+  width: '100%',
+  maxWidth: '28rem',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+};
+
+const sliderViewportStyle = {
+  overflow: 'hidden',
+  borderRadius: '0.75rem',
+  marginBottom: '1.5rem',
+};
+
+const sliderTrackStyle = {
+  display: 'flex',
+  transition: 'transform 1s ease-in-out',
+};
+
+const sliderImageStyle = {
+  width: '100%',
+  height: '17.5rem',
+  objectFit: 'cover',
+  flexShrink: '0',
+};
+
+const sliderHeadingStyle = {
+  fontSize: '1.125rem',
+  fontWeight: '600',
+  marginBottom: '0.5rem',
+  textAlign: 'center',
+};
+
+const sliderDescriptionStyle = {
+  fontSize: '0.875rem',
+  color: '#E9D5FF',
+  textAlign: 'center',
+};
+
+const sliderDotsStyle = {
+  display: 'flex',
+  justifyContent: 'center',
+  marginTop: '1.5rem',
+  gap: '0.5rem',
+};
+
+const sliderDotStyle = {
+  width: '0.5rem',
+  height: '0.5rem',
+  borderRadius: '9999px',
+  transition: 'all 0.3s',
+  backgroundColor: '#A78BFA',
+};
+
+const sliderDotActiveStyle = {
+  ...sliderDotStyle,
+  backgroundColor: 'white',
+};
+
 const ImageSlider = () => {
   const [current, setCurrent] = useState(0);
 
@@ -17,40 +85,40 @@ const ImageSlider = () => {
   }, []);
 
   return (
-    <div className="bg-purple-800 text-white p-8 flex flex-col justify-center h-full">
-      <div className="w-full max-w-md mx-auto">
-        <div className="overflow-hidden rounded-xl mb-6">
+    <div style={sliderContainerStyle}>
+      <div style={sliderWrapperStyle}>
+        <div style={sliderViewportStyle}>
           <div
-            className="flex transition-transform duration-1000 ease-in-out"
-            style={{ transform: `translateX(-${current * 100}%)` }}
+            style={{
+              ...sliderTrackStyle,
+              transform: `translateX(-${current * 100}%)`,
+            }}
           >
             {images.map((src, index) => (
               <img
                 key={index}
                 src={src}
                 alt={`slide-${index}`}
-                className="w-full h-70 object-cover flex-shrink-0"
+                style={sliderImageStyle}
               />
             ))}
           </div>
         </div>
 
-        <div className="text-center">
-          <h2 className="text-lg font-semibold mb-2">
+        <div>
+          <h2 style={sliderHeadingStyle}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
           </h2>
-          <p className="text-sm text-purple-200">
+          <p style={sliderDescriptionStyle}>
             Tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
           </p>
-          <div className="flex justify-center mt-6 space-x-2">
+          <div style={sliderDotsStyle}>
             {images.map((_, index) => (
               <span
                 key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  current === index ? "bg-white" : "bg-purple-400"
-                }`}
-              ></span>
+                style={current === index ? sliderDotActiveStyle : sliderDotStyle}
+              />
             ))}
           </div>
         </div>

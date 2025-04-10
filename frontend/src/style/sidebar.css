@@ -1,0 +1,127 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 16rem; /* w-64 */
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-right: 1px solid #e5e7eb; /* border-gray-200 */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .logo-section {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .logo-icon {
+    width: 2rem;
+    height: 2rem;
+    background-color: #4d007d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .logo-inner-box {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid white;
+  }
+  
+  .logo-text {
+    margin-left: 0.5rem;
+    color: #4d007d;
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+  
+  .search-bar {
+    padding: 0.5rem 1rem;
+  }
+  
+  .search-wrapper {
+    position: relative;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    outline: none;
+  }
+  
+  .search-input:focus {
+    border-color: #4d007d;
+    box-shadow: 0 0 0 2px rgba(77, 0, 125, 0.2);
+  }
+  
+  .menu {
+    flex: 1;
+    margin-top: 1rem;
+  }
+  
+  .menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .section-label {
+    padding: 0.5rem 1rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+  
+  .menu-item {
+    padding: 0.5rem 1rem;
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .menu-link {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.5rem;
+    border-radius: 0.375rem;
+    color: #4b5563;
+    text-decoration: none;
+  }
+  
+  .menu-link:hover {
+    color: #4d007d;
+  }
+  
+  .menu-link.active {
+    color: #4d007d;
+    font-weight: 500;
+  }
+  
+  .menu-icon {
+    margin-right: 0.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+  
+  .logout:hover {
+    background-color: #f3f4f6;
+    color: #4d007d;
+  }
+  

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ImageSlider from "../component/ImageSlider";
-import AuthInput from "../component/authInput";
+import AuthInput from "../component/AuthInput";
 import Button from "../component/Button";
 import axios from "axios";
+import "../style/auth.css";
 
 const LoginForm = () => {
   const [formData, setFormData] = useState({
@@ -24,15 +25,11 @@ const LoginForm = () => {
       setLoading(true);
       const response = await axios.post(
         "http://localhost:8080/api/users/login",
-        {
-          email: formData.email,
-          password: formData.password
-        },
+        formData,
         { withCredentials: true }
       );
-
       console.log("Login successful!");
-      navigate("/dashboard");
+      navigate("/candidates");
     } catch (error) {
       console.log(error.response?.data?.message || "Login failed");
     } finally {
@@ -41,16 +38,13 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-7xl overflow-hidden grid md:grid-cols-2">
+    <div className="auth-container">
+      <div className="auth-box">
         <ImageSlider />
-        <div className="flex flex-col justify-center items-center p-8 md:p-12">
-          <div className="w-full max-w-sm">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              Welcome to Dashboard
-            </h2>
-
-            <form className="flex flex-col space-y-4 w-full" onSubmit={handleSubmit}>
+        <div className="auth-form-container">
+          <div className="auth-form-box">
+            <h2 className="auth-heading">Welcome to Dashboard</h2>
+            <form className="auth-form" onSubmit={handleSubmit}>
               <AuthInput
                 label="Email Address"
                 type="email"
@@ -70,26 +64,15 @@ const LoginForm = () => {
                 required
               />
 
-              <div className="text-sm text-start text-gray-500 hover:underline cursor-pointer mb-2">
-                Forgot password?
-              </div>
+              <div className="forgot-password">Forgot password?</div>
 
-              <Button 
-                type="submit"
-                className="self-start px-5 text-sm my-2"
-                disabled={loading}
-              >
+              <Button type="submit" className="auth-button" disabled={loading}>
                 {loading ? "Logging in..." : "Login"}
               </Button>
 
-              <p className="text-sm text-gray-500 my-2">
+              <p className="auth-switch-text">
                 Don't have an account?{" "}
-                <Link
-                  to="/register"
-                  className="text-[#4D007D] font-medium hover:underline"
-                >
-                  Register
-                </Link>
+                <Link to="/register" className="auth-link">Register</Link>
               </p>
             </form>
           </div>

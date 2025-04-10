@@ -14,7 +14,6 @@ const hrSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["New", "Ongoing", "Selected", "Rejected"],
     default: "New",
   },
 
