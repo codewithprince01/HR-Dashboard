@@ -52,63 +52,112 @@ exports.addCandidate = async (req, res) => {
 };
 
 exports.getAllCandidates = async (req, res) => {
-  try {
-    const { status, position, search } = req.query;
-    const query = { isEmployee: false };
-    
-    if (status) query.status = status;
-    if (position) query.position = position;
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } }
-      ];
+    try {
+      const { status, position, search } = req.query;
+      const query = { isEmployee: false };
+      
+      if (status && status !== 'All') query.status = status;
+      if (position && position !== 'All') query.position = position;
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } }
+        ];
+      }
+      
+      const candidates = await HR.find(query)
+        .sort({ createdAt: -1 })
+        .select('-__v -createdAt -updatedAt');
+      
+      res.status(200).json({
+        success: true,
+        count: candidates.length,
+        data: candidates
+      });
+    } catch (err) {
+      console.error('Error fetching candidates:', err);
+      res.status(500).json({
+        success: false,
+        message: 'Server error while fetching candidates'
+      });
     }
-    
-    const candidates = await HR.find(query).sort({ srNo: 1 });
-    
-    res.status(200).json({
-      success: true,
-      data: candidates
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message
-    });
-  }
-};
+  };
 
-exports.updateCandidateStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-    
-    const candidate = await HR.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
-    
-    // If status is 'Selected', convert to employee
-    if (status === 'Selected') {
-      candidate.isEmployee = true;
-      candidate.dateOfJoining = new Date();
-      await candidate.save();
+  exports.updateCandidateStatus = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      if (!['New', 'Ongoing', 'Selected', 'Rejected'].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid status value'
+        });
+      }
+  
+      const candidate = await HR.findByIdAndUpdate(
+        id,
+        { status },
+        { new: true, runValidators: true }
+      );
+  
+      if (!candidate) {
+        return res.status(404).json({
+          success: false,
+          message: 'Candidate not found'
+        });
+      }
+  
+      if (status === 'Selected') {
+        candidate.isEmployee = true;
+        candidate.dateOfJoining = new Date();
+        await candidate.save();
+      }
+      
+      res.status(200).json({
+        success: true,
+        data: candidate
+      });
+    } catch (err) {
+      console.error('Error updating status:', err);
+      res.status(400).json({
+        success: false,
+        message: err.message.includes('Cast to ObjectId failed') 
+          ? 'Invalid candidate ID' 
+          : err.message
+      });
     }
-    
-    res.status(200).json({
-      success: true,
-      data: candidate
-    });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message
-    });
-  }
-};
+  };
+
+  exports.deleteCandidate = async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const candidate = await HR.findByIdAndDelete(id);
+      
+      if (!candidate) {
+        return res.status(404).json({
+          success: false,
+          message: 'Candidate not found'
+        });
+      }
+      
+      res.status(200).json({
+        success: true,
+        data: { id }
+      });
+    } catch (err) {
+      console.error('Error deleting candidate:', err);
+      res.status(400).json({
+        success: false,
+        message: err.message.includes('Cast to ObjectId failed') 
+          ? 'Invalid candidate ID' 
+          : err.message
+      });
+    }
+  };
+
 
 exports.downloadResume = async (req, res) => {
   try {
