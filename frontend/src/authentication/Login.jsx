@@ -38,6 +38,13 @@ const LoginForm = () => {
   };
 
   return (
+    <>
+    <div className="logo-section">
+    <div className="logo-icon">
+      <div className="logo-inner-box"></div>
+    </div>
+    <span className="logo-text">LOGO</span>
+  </div>
     <div className="auth-container">
       <div className="auth-box">
         <ImageSlider />
@@ -79,6 +86,7 @@ const LoginForm = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

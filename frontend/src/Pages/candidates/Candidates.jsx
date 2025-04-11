@@ -4,6 +4,9 @@ import AddCandidate from './AddCandidate';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCandidates, updateCandidateStatus, deleteCandidate } from '../../features/candidateSlice';
 
+import '../../style/pages.css';
+
+
 const Candidates = () => {
   const dispatch = useDispatch();
   const { data, status, error } = useSelector(state => state.candidates);
@@ -34,6 +37,7 @@ const Candidates = () => {
     try {
       await dispatch(updateCandidateStatus({ id, status: newStatus })).unwrap();
       setActionMenuOpen(null);
+      setStatusFilter('All');
     } catch (error) {
       console.error('Status update failed:', error);
     } finally {
@@ -57,11 +61,11 @@ const Candidates = () => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'New': return 'bg-white border border-gray-300 text-gray-700';
-      case 'Ongoing': return 'bg-white border border-blue-400 text-blue-500';
-      case 'Selected': return 'bg-white border border-[#4d007d] text-[#4d007d]';
-      case 'Rejected': return 'bg-white border border-[#b70000] text-[#b70000]';
-      default: return 'bg-white border border-gray-300 text-gray-700';
+      case 'New': return 'status-new';
+      case 'Ongoing': return 'status-ongoing';
+      case 'Selected': return 'status-selected';
+      case 'Rejected': return 'status-rejected';
+      default: return 'status-new';
     }
   };
 
@@ -74,19 +78,19 @@ const Candidates = () => {
     return matchesSearch && matchesStatus && matchesPosition;
   });
 
-  if (status === 'loading') return <div className="text-center py-8">Loading candidates...</div>;
-  if (error) return <div className="text-red-500 p-4">Error: {error}</div>;
+  if (status === 'loading') return <div className="loading">Loading candidates...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
-    <div className="p-4">
-      {/* Filters and Search */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <div className="relative w-full sm:w-48">
+    <div className="candidates-container">
+
+      <div className="filters-container">
+        <div className="filters-group">
+          <div className="select-container rounded-full">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4d007d] cursor-pointer w-full"
+              className="select"
             >
               <option value="All">All Status</option>
               <option value="New">New</option>
@@ -94,14 +98,14 @@ const Candidates = () => {
               <option value="Selected">Selected</option>
               <option value="Rejected">Rejected</option>
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <FaChevronDown className="chevron-icon" />
           </div>
 
-          <div className="relative w-full sm:w-48">
+          <div className="select-container">
             <select
               value={positionFilter}
               onChange={(e) => setPositionFilter(e.target.value)}
-              className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4d007d] cursor-pointer w-full"
+              className="select"
             >
               <option value="All">All Positions</option>
               <option value="Senior Developer">Senior Developer</option>
@@ -109,82 +113,76 @@ const Candidates = () => {
               <option value="Full Time Designer">Full Time Designer</option>
               <option value="Full Time Developer">Full Time Developer</option>
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <FaChevronDown className="chevron-icon" />
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <div className="relative w-full sm:w-64">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="filters-group">
+          <div className="search-containerr">
+            <FaSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 py-2 pr-4 border border-gray-300 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-[#4d007d]"
+              className="search-input"
             />
           </div>
           <button
             onClick={handleAddCandidate}
-            className="bg-[#4d007d] text-white px-4 py-2 rounded-md hover:bg-[#3b0060] transition-colors w-full sm:w-auto"
+            className="add-button"
           >
             Add Candidate
           </button>
         </div>
       </div>
 
-      {/* Candidate Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-md">
-        <table className="min-w-full bg-white">
+     
+      <div className="table-container">
+        <table className="table">
           <thead>
-            <tr className="bg-[#4d007d] text-white text-left">
-              <th className="py-3 px-4">Sr no.</th>
-              <th className="py-3 px-4">Name</th>
-              <th className="py-3 px-4">Email</th>
-              <th className="py-3 px-4">Phone</th>
-              <th className="py-3 px-4">Position</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Experience</th>
-              <th className="py-3 px-4">Action</th>
+            <tr>
+              <th>Sr no.</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Position</th>
+              <th>Status</th>
+              <th>Experience</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {filteredCandidates.map((candidate, index) => (
-              <tr key={`${candidate._id}-${index}`} className="border-t border-gray-200 hover:bg-gray-50">
-                <td className="py-4 px-4">{index + 1}</td>
-                <td className="py-4 px-4">{candidate.name}</td>
-                <td className="py-4 px-4">{candidate.email}</td>
-                <td className="py-4 px-4">{candidate.phone}</td>
-                <td className="py-4 px-4">{candidate.position}</td>
+              <tr key={`${candidate._id}-${index}`}>
+                <td>{index + 1}</td>
+                <td>{candidate.name}</td>
+                <td>{candidate.email}</td>
+                <td>{candidate.phone}</td>
+                <td>{candidate.position}</td>
 
-                {/* Status Dropdown */}
-                <td className="py-4 px-4 relative">
-                  <div className="relative inline-block">
+          
+                <td>
+                  <div className="status-container">
                     <button
                       onClick={() => toggleActionMenu(`status-${candidate._id}`)}
-                      className={`${getStatusStyle(candidate.status)} px-4 py-1 rounded-full flex items-center ${
-                        updatingStatusId === candidate._id ? 'opacity-50' : ''
-                      }`}
+                      className={`status-button ${getStatusStyle(candidate.status)} ${updatingStatusId === candidate._id ? 'disabled' : ''}`}
                       disabled={updatingStatusId === candidate._id}
                     >
                       {candidate.status}
                       {updatingStatusId === candidate._id ? (
-                        <span className="ml-2">Updating...</span>
+                        <span style={{ marginLeft: '8px' }}>Updating...</span>
                       ) : (
-                        <FaChevronDown className="ml-2 w-3 h-3" />
+                        <FaChevronDown className="chevron-icon" />
                       )}
                     </button>
                     {actionMenuOpen === `status-${candidate._id}` && (
-                      <div className="absolute z-10 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg">
+                      <div className="status-menu">
                         {['New', 'Ongoing', 'Selected', 'Rejected'].map((statusOption) => (
                           <button
                             key={`${candidate._id}-${statusOption}`}
                             onClick={() => handleUpdateStatus(candidate._id, statusOption)}
-                            className={`block w-full text-left px-4 py-2 text-sm ${
-                              candidate.status === statusOption 
-                                ? 'bg-[#4d007d] text-white' 
-                                : 'text-gray-700 hover:bg-gray-100'
-                            }`}
+                            className={candidate.status === statusOption ? 'active' : ''}
                           >
                             {statusOption}
                           </button>
@@ -194,37 +192,38 @@ const Candidates = () => {
                   </div>
                 </td>
 
-                <td className="py-4 px-4">{candidate.experience || '-'}</td>
+                <td>{candidate.experience || '-'}</td>
 
-                {/* Action Dropdown */}
-                <td className="py-4 px-4 relative">
-                  <button
-                    onClick={() => toggleActionMenu(candidate._id)}
-                    className="text-gray-600 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100"
-                    disabled={deletingCandidateId === candidate._id}
-                  >
-                    {deletingCandidateId === candidate._id ? 'Deleting...' : <FaEllipsisV />}
-                  </button>
-                  {actionMenuOpen === candidate._id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                      <div className="py-1">
-                        <a
-                          href={`http://localhost:8080/api/candidates/${candidate._id}/resume`}
-                          download
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Download Resume
-                        </a>
-                        <button
-                          onClick={() => handleDeleteCandidate(candidate._id)}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-red-600 hover:text-red-800"
-                          disabled={deletingCandidateId === candidate._id}
-                        >
-                          Delete Candidate
-                        </button>
+            
+                <td>
+                  <div className="action-container">
+                    <button
+                      onClick={() => toggleActionMenu(candidate._id)}
+                      className="action-button"
+                      disabled={deletingCandidateId === candidate._id}
+                    >
+                      {deletingCandidateId === candidate._id ? 'Deleting...' : <FaEllipsisV />}
+                    </button>
+                    {actionMenuOpen === candidate._id && (
+                      <div className="action-menu">
+                        <div>
+                          <a
+                            href={`http://localhost:8080/api/candidates/${candidate._id}/resume`}
+                            download
+                          >
+                            Download Resume
+                          </a>
+                          <button
+                            onClick={() => handleDeleteCandidate(candidate._id)}
+                            className="delete"
+                            disabled={deletingCandidateId === candidate._id}
+                          >
+                            Delete Candidate
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

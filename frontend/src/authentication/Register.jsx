@@ -6,6 +6,7 @@ import Button from "../component/Button";
 import axios from "axios";
 import "../style/auth.css";
 
+
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
     fullname: "",
@@ -49,6 +50,13 @@ const RegistrationForm = () => {
   };
 
   return (
+<>
+    <div className="logo-section">
+    <div className="logo-icon">
+      <div className="logo-inner-box"></div>
+    </div>
+    <span className="logo-text">LOGO</span>
+  </div>
     <div className="auth-container">
       <div className="auth-box">
         <ImageSlider />
@@ -106,6 +114,7 @@ const RegistrationForm = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

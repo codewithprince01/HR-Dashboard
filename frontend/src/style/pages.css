@@ -1,0 +1,600 @@
+/* Common Container Styles */
+.common-container {
+    padding: 16px;
+  }
+  
+  /* Common Filters and Search Styles */
+  .filters-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    gap: 16px;
+    
+  }
+  
+  @media (min-width: 768px) {
+    .filters-container {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+  
+  .filters-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+  
+  @media (min-width: 640px) {
+    .filters-group {
+      flex-direction: row;
+      width: auto;
+    }
+  }
+  
+  .select-container {
+    position: relative;
+    display: inline-block;
+    width: 200px;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    overflow: hidden;
+    background-color: white;
+  }
+  
+  @media (min-width: 640px) {
+    .select-container {
+      width: 192px;
+    }
+  }
+  
+  .select {
+    appearance: none;
+  width: 100%;
+  padding: 8px 40px 8px 16px;
+  border: none;
+  border-radius: 9999px;
+  outline: none;
+  background-color: transparent;
+  font-size: 16px;
+  }
+  
+  .select:focus {
+    border-color: #4d007d;
+    box-shadow: 0 0 0 2px #4d007d;
+  }
+  
+  .chevron-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .search-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  @media (min-width: 640px) {
+    .search-container {
+      width: 372px;
+    }
+  }
+  
+  @media (min-width: 640px) {
+    .search-containerr {
+      width: 275px;
+    }
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+  }
+  .search-input {
+    padding: 8px 16px 8px 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    width: 100%;
+    outline: none;
+  }
+  
+  
+  .search-input:focus {
+    border-color: #4d007d;
+    box-shadow: 0 0 0 2px #4d007d;
+  }
+  
+  .add-button {
+    background-color: #4d007d;
+    color: #fff;
+    padding: 8px 50px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    min-width:174px!important;
+    text-align: center;
+    border-radius: 9999px;
+  }
+  
+  .add-button:hover {
+    background-color: #3b0060;
+  }
+  
+  @media (min-width: 640px) {
+    .add-button {
+      width: auto;
+    }
+  }
+  
+  /* Common Table Styles */
+  .table-container {
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+  }
+  
+  .table {
+    width: 100%;
+    background-color: #fff;
+    border-collapse: collapse;
+  }
+  
+  .table thead tr {
+    background-color: #4d007d;
+    color: #fff;
+    text-align: left;
+  }
+  
+  .table th {
+    padding: 12px 16px;
+  }
+  
+  .table tbody tr {
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .table tbody tr:hover {
+    background-color: #f9fafb;
+  }
+  
+  .table td {
+    padding: 16px 16px;
+  }
+  
+  /* Common Profile Image Styles */
+  .profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .profile-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+  }
+  
+  /* Common Action Dropdown Styles */
+  .action-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .action-button {
+    color: #4b5563;
+    padding: 4px;
+    border-radius: 9999px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .action-button:hover {
+    color: #1f2937;
+    background-color: #f3f4f6;
+  }
+  
+  .action-button:disabled {
+    cursor: not-allowed;
+  }
+  
+  .action-menu {
+    position: absolute;
+    right: 0;
+    margin-top: 8px;
+    width: 192px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .action-menu div {
+    padding: 4px 0;
+  }
+  
+  .action-menu a,
+  .action-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #374151;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .action-menu a:hover,
+  .action-menu button:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .action-menu button.delete {
+    color: #dc2626;
+  }
+  
+  .action-menu button.delete:hover {
+    color: #b91c1c;
+  }
+  
+  /* Common Loading and Error Styles */
+  .loading {
+    text-align: center;
+    padding: 32px 0;
+  }
+  
+  .error {
+    color: #ef4444;
+    padding: 16px;
+  }
+
+
+  /* Candidate */
+
+  /* Status Dropdown */
+  .status-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .status-button {
+    padding: 4px 16px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .status-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .status-button .chevron-icon {
+    margin-left: 8px;
+    width: 12px;
+    height: 12px;
+  }
+  
+  .status-menu {
+    position: absolute;
+    z-index: 10;
+    margin-top: 8px;
+    width: 160px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .status-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #374151;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .status-menu button:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .status-menu button.active {
+    background-color: #4d007d;
+    color: #fff;
+  }
+  
+  /* Status Styles */
+  .status-new {
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    color: #374151;
+  }
+  
+  .status-ongoing {
+    background-color: #fff;
+    border: 1px solid #60a5fa;
+    color: #3b82f6;
+  }
+  
+  .status-selected {
+    background-color: #fff;
+    border: 1px solid #4d007d;
+    color: #4d007d;
+  }
+  
+  .status-rejected {
+    background-color: #fff;
+    border: 1px solid #b70000;
+    color: #b70000;
+  }
+
+  /* Employee */
+
+  .employees-container {
+    padding: 0;
+  }
+  
+  .filters-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .filters-group {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .search-wrapper {
+    position: relative;
+  }
+
+  /* Attendance */
+  
+  /* Status Dropdown */
+  .status-select {
+    border-radius: 9999px !important;
+    padding: 4px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    border: 1px solid #4d007d !important;
+    background-color: white;
+  }
+  
+  .status-present {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+  
+  .status-unmark {
+    background-color: #fefce8;
+    color: #ca8a04;
+  }
+  
+  .status-default {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+
+  /* Leaves */
+
+  .leaves-container {
+    padding: 0;
+  }
+  
+  /* Main Layout */
+  .main-layout {
+    display: flex;
+  }
+  
+  .left-section {
+    width: 66.67%;
+    padding-right: 16px;
+  }
+  
+  .right-section {
+    width: 33.33%;
+    padding-left: 16px;
+  }
+  
+  /* Status Styles */
+  .status-select {
+    padding: 4px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #fff;
+    outline: none;
+    cursor: pointer;
+  }
+  
+  .status-select:focus {
+    border-color: #4d007d;
+    box-shadow: 0 0 0 2px #4d007d;
+  }
+  
+  .status-span {
+    display: inline-block;
+    padding: 4px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 9999px;
+    cursor: pointer;
+  }
+  
+  .status-approved {
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+  
+  .status-pending {
+    background-color: #fefce8;
+    color: #a16207;
+  }
+  
+  .status-rejected {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .download-button {
+    color: #2563eb;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .download-button:hover {
+    color: #1e40af;
+  }
+  
+  /* Calendar Section */
+  .calendar-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #fff;
+    margin-bottom: 16px;
+  }
+  
+  .calendar-header {
+    background-color: #4d007d;
+    color: #fff;
+    padding: 12px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  
+  .calendar-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .calendar-content {
+    padding: 16px;
+  }
+  
+  .react-calendar {
+    border: none;
+    width: 100%;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4d007d;
+    margin-top: 4px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .leave-details {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #fff;
+  }
+  
+  .leave-details h3 {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .leave-details-content {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+  }
+  
+  .leave-details-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .leave-details-info p {
+    font-size: 14px;
+  }
+  
+  .leave-details-info .name {
+    font-weight: 600;
+  }
+  
+  .leave-details-info .date {
+    color: #4b5563;
+  }
+  
+  /* Approved Leaves List */
+  .approved-leaves-container {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px;
+  }
+  
+  .approved-leaves-container h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4d007d;
+    margin-bottom: 16px;
+  }
+  
+  .approved-leave-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .approved-leave-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .approved-leave-info p {
+    font-size: 14px;
+  }
+  
+  .approved-leave-info .name {
+    font-weight: 600;
+  }
+  
+  .approved-leave-info .date {
+    font-size: 12px;
+    color: #4b5563;
+  }
+  
+  .no-leaves {
+    color: #4b5563;
+    font-size: 14px;
+  }

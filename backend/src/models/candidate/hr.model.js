@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const hrSchema = new mongoose.Schema({
@@ -14,6 +15,7 @@ const hrSchema = new mongoose.Schema({
 
   status: {
     type: String,
+    enum: ["New", "Ongoing", "Selected", "Rejected"],
     default: "New",
   },
 
@@ -25,8 +27,18 @@ const hrSchema = new mongoose.Schema({
   attendance: [
     {
       date: { type: Date, default: Date.now },
-      status: { type: String, enum: ["Present", "Absent"], default: "Present" },
+      status: { type: String, enum: ["Unmark","Present", "Absent", "Medical Leave", "Work from Home"], default: "Unmark" },
       task: { type: String },
+    },
+  ],
+
+  leaves: [
+    {
+      designation: { type: String, required: true },
+      leaveDate: { type: Date, required: true },
+      documents: { type: String },
+      reason: { type: String, required: true },
+      status: { type: String, enum: ["Pending", "Approved", "Rejected"], default: "Pending" },
     },
   ],
 
@@ -44,6 +56,5 @@ hrSchema.pre("save", async function (next) {
     next(err);
   }
 });
-
 
 module.exports = mongoose.model("HR", hrSchema);

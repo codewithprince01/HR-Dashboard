@@ -6,7 +6,7 @@ import '../style/sidebar.css';
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      {/* Logo Section */}
+    
       <div className="logo-section">
         <div className="logo-icon">
           <div className="logo-inner-box"></div>
@@ -14,7 +14,6 @@ const Sidebar = () => {
         <span className="logo-text">LOGO</span>
       </div>
 
-      {/* Search Bar */}
       <div className="search-bar">
         <div className="search-wrapper">
           <FaSearch className="search-icon" />
@@ -26,7 +25,6 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Menu Items */}
       <nav className="menu">
         <ul className="menu-list">
           <li className="section-label">Recruitment</li>
@@ -49,7 +47,7 @@ const Sidebar = () => {
                 `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="menu-icon" /> Employees
+              <FaUsers  className="menu-icon" />  Employees
             </NavLink>
           </li>
           <li className="menu-item">
@@ -59,7 +57,7 @@ const Sidebar = () => {
                 `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="menu-icon" /> Attendence
+              <FaClock  className="menu-icon" /> Attendence
             </NavLink>
           </li>
           <li className="menu-item">
@@ -69,7 +67,7 @@ const Sidebar = () => {
                 `menu-link ${isActive ? 'active' : ''}`
               }
             >
-              <FaUser className="menu-icon" /> Leaves
+               <FaCalendarAlt  className="menu-icon" /> Leaves
             </NavLink>
           </li>
 

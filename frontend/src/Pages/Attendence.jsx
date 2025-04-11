@@ -1,169 +1,175 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaSearch, FaChevronDown, FaEllipsisV } from 'react-icons/fa';
+import { fetchAttendance, markAttendance } from '../features/attendanceSlice';
+import '../style/pages.css';
 
-const Attendence = () => {
+const Attendance = () => {
   const [actionMenuOpen, setActionMenuOpen] = useState(null);
-  const [statuses, setStatuses] = useState({
-    1: 'Present',
-    2: 'Present',
-    3: 'Absent',
-    4: 'Present',
-  });
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const dispatch = useDispatch();
+  const { employees, status, error } = useSelector((state) => state.attendance);
+
+  useEffect(() => {
+    dispatch(fetchAttendance());
+  }, [dispatch]);
 
   const toggleActionMenu = (id) => {
     setActionMenuOpen((prev) => (prev === id ? null : id));
   };
 
-  const handleStatusChange = (id, newStatus) => {
-    setStatuses({ ...statuses, [id]: newStatus });
+  const handleStatusChange = async (employee, newStatus) => {
+    const todayAttendance = employee.attendance.find(
+      (a) => new Date(a.date).toDateString() === new Date().toDateString()
+    );
+    const na = todayAttendance ? todayAttendance.na : 'NA';
+    await dispatch(markAttendance({ id: employee._id, status: newStatus, na }));
   };
 
-  const candidates = [
-    {
-      id: 1,
-      name: 'Jane Copper',
-      email: 'jane.copper@example.com',
-      phone: '(252) 555-0111',
-      position: 'Full Time',
-      department: 'Designer',
-      task: 'Dashboard Home page Alignment',
-      profile: 'https://randomuser.me/api/portraits/women/32.jpg',
-    },
-    {
-      id: 2,
-      name: 'Arlene McCoy',
-      email: 'arlene.mccoy@example.com',
-      phone: '(302) 555-0107',
-      position: 'Full Time',
-      department: 'Designer',
-      task: 'Dashboard Login page design, Dashboard Home page design',
-      profile: 'https://randomuser.me/api/portraits/women/25.jpg',
-    },
-    {
-      id: 3,
-      name: 'Cody Fisher',
-      email: 'cody.fisher@example.com',
-      phone: '(907) 555-0101',
-      position: 'Senior',
-      department: 'Backend Development',
-      task: '--',
-      profile: 'https://randomuser.me/api/portraits/men/44.jpg',
-    },
-    {
-      id: 4,
-      name: 'Janney Wilson',
-      email: 'janney.wilson@example.com',
-      phone: '(207) 555-0119',
-      position: 'Junior',
-      department: 'Backend Development',
-      task: 'Dashboard login page integration',
-      profile: 'https://randomuser.me/api/portraits/women/68.jpg',
-    },
-    {
-      id: 5,
-      name: 'Leslie Alexander',
-      email: 'leslie.alexander@example.com',
-      phone: '(252) 555-0190',
-      position: 'Team Lead',
-      department: 'Human Resource',
-      task: '4 scheduled interview, Sorting of resumes',
-      profile: 'https://randomuser.me/api/portraits/men/50.jpg',
-    },
-  ];
+  const filteredEmployees = employees.filter((employee) => {
+    const todayAttendance = employee.attendance.find(
+      (a) => new Date(a.date).toDateString() === new Date().toDateString()
+    );
+    const currentStatus = todayAttendance ? todayAttendance.status : 'Unmark';
+
+    const matchesStatus =
+      statusFilter === 'All' || currentStatus === statusFilter;
+    const matchesSearch =
+      searchTerm === '' ||
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesStatus && matchesSearch;
+  });
+
+  const getStatusClass = (currentStatus) => {
+    switch (currentStatus) {
+      case 'Present':
+        return 'status-present';
+      case 'Unmark':
+        return 'status-unmark';
+      default:
+        return 'status-default';
+    }
+  };
+
+  if (status === 'loading') {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div className="error">Error: {error}</div>;
+  }
 
   return (
-    <div className="">
+    <div className="attendance-container">
       {/* Filter & Search */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex space-x-4">
-          <div className="relative">
-            <select className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4d007d] cursor-pointer">
-              <option>Status</option>
-              <option>New</option>
-              <option>Selected</option>
-              <option>Rejected</option>
+      <div className="filters-container">
+        <div className="filters-group">
+          <div className="select-container">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="select"
+            >
+              <option value="All">Status</option>
+              <option value="Unmark">Unmark</option>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Medical Leave">Medical Leave</option>
+              <option value="Work from Home">Work from Home</option>
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <FaChevronDown className="chevron-icon" />
           </div>
         </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="search-container">
+          <div className="search-wrapper">
+            <FaSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search"
-              className="pl-10 py-2 pr-4 border border-gray-300 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-[#4d007d]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
             />
           </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-md">
-        <table className="min-w-full bg-white">
+      <div className="table-container">
+        <table className="table">
           <thead>
-            <tr className="bg-[#4d007d] text-white text-left">
-              <th className="py-3 px-4">Profile</th>
-              <th className="py-3 px-4">Employee Name</th>
-              <th className="py-3 px-4">Position</th>
-              <th className="py-3 px-4">Department</th>
-              <th className="py-3 px-4">Task</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Action</th>
+            <tr>
+              <th>Profile</th>
+              <th>Employee Name</th>
+              <th>Position</th>
+              <th>Department</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {candidates.map((candidate) => (
-              <tr key={candidate.id} className="border-t border-gray-200">
-                <td className="py-4 px-4">
-                  <img
-                    src={candidate.profile}
-                    alt={candidate.name}
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
-                </td>
-                <td className="py-4 px-4">{candidate.name}</td>
-                <td className="py-4 px-4">{candidate.position}</td>
-                <td className="py-4 px-4">{candidate.department}</td>
-                <td className="py-4 px-4">{candidate.task}</td>
-                <td className="py-4 px-4">
-                  <select
-                    value={statuses[candidate.id] || 'Present'}
-                    onChange={(e) => handleStatusChange(candidate.id, e.target.value)}
-                    className={`rounded-full px-3 py-1 text-sm font-medium focus:outline-none ${
-                      statuses[candidate.id] === 'Present'
-                        ? 'bg-green-100 text-green-600'
-                        : 'bg-red-100 text-red-600'
-                    }`}
-                  >
-                    <option value="Present">Present</option>
-                    <option value="Absent">Absent</option>
-                  </select>
-                </td>
-                <td className="py-4 px-4 relative">
-                  <button
-                    onClick={() => toggleActionMenu(candidate.id)}
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    <FaEllipsisV />
-                  </button>
+            {filteredEmployees.map((employee) => {
+              const todayAttendance = employee.attendance.find(
+                (a) => new Date(a.date).toDateString() === new Date().toDateString()
+              );
+              const currentStatus = todayAttendance ? todayAttendance.status : 'Unmark';
+              const currentNA = todayAttendance ? todayAttendance.na : 'NA';
 
-                  {actionMenuOpen === candidate.id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                      <div className="py-1">
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Edit Candidate
-                        </button>
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Delete Candidate
-                        </button>
-                      </div>
+              return (
+                <tr key={employee._id}>
+                  <td>
+                    <img
+                      src={employee.profileImage || 'https://randomuser.me/api/portraits/men/32.jpg'}
+                      alt={employee.name}
+                      className="profile-image"
+                    />
+                  </td>
+                  <td>{employee.name}</td>
+                  <td>{employee.position}</td>
+                  <td>{employee.department || 'N/A'}</td>
+                  <td>{currentNA || 'N/A'}</td>
+                  <td>
+                    <select
+                      value={currentStatus}
+                      onChange={(e) => handleStatusChange(employee, e.target.value)}
+                      className={`status-select ${getStatusClass(currentStatus)}`}
+                    >
+                      <option value="Unmark">Unmark</option>
+                      <option value="Present">Present</option>
+                      <option value="Absent">Absent</option>
+                      <option value="Medical Leave">Medical Leave</option>
+                      <option value="Work from Home">Work from Home</option>
+                    </select>
+                  </td>
+                  <td>
+                    <div className="action-container">
+                      <button
+                        onClick={() => toggleActionMenu(employee._id)}
+                        className="action-button"
+                      >
+                        <FaEllipsisV />
+                      </button>
+                      {actionMenuOpen === employee._id && (
+                        <div className="action-menu">
+                          {/* Commented out as per original code */}
+                          {/* <div>
+                            <button>
+                              Edit Employee
+                            </button>
+                            <button>
+                              Delete Employee
+                            </button>
+                          </div> */}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -171,4 +177,4 @@ const Attendence = () => {
   );
 };
 
-export default Attendence;
+export default Attendance;

@@ -1,169 +1,354 @@
-import React, { useState } from 'react';
-import { FaSearch, FaChevronDown, FaEllipsisV } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { FaSearch, FaChevronDown, FaFileDownload } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchLeaves } from "../features/leaveSlice";
+import { fetchEmployees } from "../features/employeeSlice";
+import AddLeaves from "./AddLeaves";
+import axios from "axios";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { format } from 'date-fns';
+import '../style/pages.css';
 
-const LeaveManagement = () => {
-  const [actionMenuOpen, setActionMenuOpen] = useState(null);
 
-  const toggleActionMenu = (id) => {
-    setActionMenuOpen(prev => (prev === id ? null : id));
+
+const Leaves = () => {
+  const [isAddLeaveOpen, setIsAddLeaveOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const dispatch = useDispatch();
+  const { leaves, status: leaveStatus, error: leaveError } = useSelector(
+    (state) => state.leaves
+  );
+  const { employees, status: empStatus, error: empError } = useSelector(
+    (state) => state.employees
+  );
+
+  useEffect(() => {
+    dispatch(fetchLeaves());
+    dispatch(fetchEmployees());
+  }, [dispatch]);
+
+  const toggleStatusDropdown = (id) => {
+    setStatusDropdownOpen((prev) => (prev === id ? null : id));
   };
 
-  const leaves = [
-    {
-      id: 1,
-      employee: "Jacob William",
-      leaveType: "Sick Leave",
-      fromDate: "2025-04-01",
-      toDate: "2025-04-03",
-      days: 3,
-      status: "Pending",
-    },
-    {
-      id: 2,
-      employee: "Guy Hawkins",
-      leaveType: "Casual Leave",
-      fromDate: "2025-04-04",
-      toDate: "2025-04-05",
-      days: 2,
-      status: "Approved",
-    },
-    {
-      id: 3,
-      employee: "Arlene McCoy",
-      leaveType: "Maternity Leave",
-      fromDate: "2025-03-01",
-      toDate: "2025-06-01",
-      days: 92,
-      status: "Rejected",
-    },
-  ];
+  const handleStatusChange = async (e, leaveId, currentStatus) => {
+    const newStatus = e.target.value;
+    if (newStatus !== currentStatus) {
+      try {
+        await axios.patch(`http://localhost:8080/api/leaves/${leaveId}`, {
+          status: newStatus,
+        });
+        dispatch(fetchLeaves());
+        setStatusDropdownOpen(null);
+      } catch (error) {
+        console.error("Failed to update status:", error);
+      }
+    } else {
+      setStatusDropdownOpen(null);
+    }
+  };
+
+  const handleDownloadDocument = async (leave) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/leaves/${leave._id}/document`,
+        {
+          responseType: "blob",
+        }
+      );
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute(
+        "download",
+        leave.documents?.split("/").pop() || "document.pdf"
+      );
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download document:", error);
+    }
+  };
+
+  const handleAddLeaveClick = () => {
+    console.log("Add Leave button clicked");
+    setIsAddLeaveOpen(true);
+  };
+
+  const handleCloseAddLeave = () => {
+    console.log("Closing Add Leave modal");
+    setIsAddLeaveOpen(false);
+  };
+
+  const filteredLeaves = leaves
+    .filter((leave) => leave !== null && leave !== undefined)
+    .filter((leave) => {
+      const employee = employees.find((emp) =>
+        emp.leaves.some((l) => l._id === leave._id)
+      );
+      const matchesSearch = employee
+        ? employee.name.toLowerCase().includes(searchTerm.toLowerCase())
+        : true;
+      const matchesStatus =
+        statusFilter === "All" || leave.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+
+  const approvedLeavesList = filteredLeaves
+    .filter((leave) => leave.status === "Approved")
+    .map((leave) => {
+      const employee = employees.find((emp) =>
+        emp.leaves.some((l) => l._id === leave._id)
+      );
+      return { ...leave, employee };
+    });
+
+  const approvedLeavesForCalendar = approvedLeavesList.map((leave) => ({
+    date: leave.leaveDate ? format(new Date(leave.leaveDate), 'yyyy-MM-dd') : null,
+  }));
+
+  const tileContent = ({ date, view }) => {
+    if (view === "month") {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const hasApprovedLeave = approvedLeavesForCalendar.some(
+        (leave) => leave.date === dateStr
+      );
+      return hasApprovedLeave ? <div className="dot"></div> : null;
+    }
+    return null;
+  };
+
+  const handleDateClick = (date) => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    const leaveOnDate = approvedLeavesList.find(
+      (leave) => leave.leaveDate && format(new Date(leave.leaveDate), 'yyyy-MM-dd') === dateStr
+    );
+    setSelectedDate(leaveOnDate || null);
+  };
+
+  if (leaveStatus === "loading" || empStatus === "loading")
+    return <div className="loading">Loading...</div>;
+  if (leaveStatus === "failed") return <div className="error">Error: {leaveError}</div>;
+  if (empStatus === "failed") return <div className="error">Error: {empError}</div>;
 
   return (
-    <div className="">
-      {/* Filters and Search Bar */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex space-x-4">
-          <div className="relative">
-            <select className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4d007d] cursor-pointer">
-              <option>Status</option>
-              <option>Pending</option>
-              <option>Approved</option>
-              <option>Rejected</option>
-            </select>
-            <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-          </div>
+    <div className="leaves-container">
+      <div className="filters-container">
+        <div className="select-container">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="select"
+          >
+            <option value="All">Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <FaChevronDown className="chevron-icon" />
         </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="search-container">
+          <div className="search-wrapper">
+            <FaSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search Employee"
-              className="pl-10 py-2 pr-4 border border-gray-300 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-[#4d007d]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
             />
+          </div>
+          <button
+            onClick={handleAddLeaveClick}
+            className="add-button  px-6 py-2"
+          >
+            Add Leave
+          </button>
+        </div>
+      </div>
+      <div className="main-layout">
+    
+        <div className="left-section">
+          <div className="table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Profile</th>
+                  <th>Name</th>
+                  <th>Date</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Docs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLeaves.map((leave) => {
+                  const employee = employees.find((emp) =>
+                    emp.leaves.some((l) => l._id === leave._id)
+                  );
+                  return (
+                    <tr key={leave._id}>
+                      <td>
+                        {employee?.profileImage ? (
+                          <img
+                            src={employee.profileImage || 'https://randomuser.me/api/portraits/men/32.jpg'}
+                            alt="Profile"
+                            className="profile-image"
+                          />
+                        ) : (
+                          <div className="profile-placeholder">
+                            <img
+                              src='https://randomuser.me/api/portraits/men/32.jpg'
+                              alt="Profile"
+                              className="profile-image"
+                            />
+                          </div>
+                        )}
+                      </td>
+                      <td>{employee ? employee.name : "N/A"}</td>
+                      <td>
+                        {leave.leaveDate
+                          ? format(new Date(leave.leaveDate), 'dd/MM/yyyy')
+                          : "N/A"}
+                      </td>
+                      <td>{leave.reason || "N/A"}</td>
+                      <td>
+                        {statusDropdownOpen === leave._id ? (
+                          <select
+                            value={leave.status}
+                            onChange={(e) =>
+                              handleStatusChange(e, leave._id, leave.status)
+                            }
+                            onBlur={() => setStatusDropdownOpen(null)}
+                            className="status-select"
+                            autoFocus
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+                        ) : (
+                          <span
+                            className={`status-span ${leave.status === "Approved" ? "status-approved" : leave.status === "Pending" ? "status-pending" : "status-rejected"}`}
+                            onClick={() => toggleStatusDropdown(leave._id)}
+                          >
+                            {leave.status || "N/A"}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        {leave.documents && (
+                          <button
+                            onClick={() => handleDownloadDocument(leave)}
+                            className="download-button"
+                          >
+                            <FaFileDownload />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+    
+        <div className="right-section">
+       
+          <div className="calendar-container">
+            <div className="calendar-header">
+              <h2>Leave Calendar</h2>
+            </div>
+            <div className="calendar-content">
+              <Calendar
+                onClickDay={handleDateClick}
+                tileContent={tileContent}
+                value={new Date()}
+                className="react-calendar"
+              />
+              {selectedDate && selectedDate.employee && (
+                <div className="leave-details">
+                  <h3>Approved Leave</h3>
+                  <div className="leave-details-content">
+                    {selectedDate.employee?.profileImage ? (
+                      <img
+                        src={selectedDate.employee.profileImage}
+                        alt="Profile"
+                        className="leave-details-image"
+                      />
+                    ) : (
+                      <div className="leave-details-placeholder"></div>
+                    )}
+                    <div className="leave-details-info">
+                      <p className="name">{selectedDate.employee.name}</p>
+                      <p className="date">
+                        {selectedDate.leaveDate
+                          ? format(new Date(selectedDate.leaveDate), 'dd/MM/yyyy')
+                          : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+        
+          <div className="approved-leaves-container">
+            <h2>Approved Leaves</h2>
+            {approvedLeavesList.length > 0 ? (
+              approvedLeavesList.map((leave) => (
+                <div key={leave._id} className="approved-leave-item">
+                  {leave.employee?.profileImage ? (
+                    <img
+                      src={leave.employee.profileImage}
+                      alt="Profile"
+                      className="approved-leave-image"
+                    />
+                  ) : (
+                    <div className="approved-leave-placeholder">
+                      <img
+                        src="https://randomuser.me/api/portraits/men/32.jpg"
+                        alt="Profile"
+                        className="approved-leave-image"
+                      />
+                    </div>
+                  )}
+                  <div className="approved-leave-info">
+                    <p className="name">{leave.employee?.name}</p>
+                    <p className="date">
+                      {leave.leaveDate
+                        ? format(new Date(leave.leaveDate), 'dd/MM/yyyy')
+                        : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="no-leaves">No approved leaves.</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Leave Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-md">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="bg-[#4d007d] text-white text-left">
-              <th className="py-3 px-4">Employee Name</th>
-              <th className="py-3 px-4">Leave Type</th>
-              <th className="py-3 px-4">From</th>
-              <th className="py-3 px-4">To</th>
-              <th className="py-3 px-4">No. of Days</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaves.map((leave) => (
-              <tr key={leave.id} className="border-t border-gray-200">
-                <td className="py-4 px-4">{leave.employee}</td>
-                <td className="py-4 px-4">{leave.leaveType}</td>
-                <td className="py-4 px-4">{leave.fromDate}</td>
-                <td className="py-4 px-4">{leave.toDate}</td>
-                <td className="py-4 px-4">{leave.days}</td>
-                <td className="py-4 px-4">
-                  <span
-                    className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
-                      leave.status === 'Approved'
-                        ? 'bg-green-100 text-green-700'
-                        : leave.status === 'Pending'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}
-                  >
-                    {leave.status}
-                  </span>
-                </td>
-                <td className="py-4 px-4 relative">
-                  <button
-                    onClick={() => toggleActionMenu(leave.id)}
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    <FaEllipsisV />
-                  </button>
 
-                  {actionMenuOpen === leave.id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                      <div className="py-1">
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Approve Leave
-                        </button>
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Reject Leave
-                        </button>
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Delete Request
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className="w-[300px] bg-white shadow-md rounded-lg p-4">
-            <div className="bg-[#4D007D] text-white rounded-t-md px-4 py-2 font-semibold">Leave Calendar</div>
-            <div className="p-2">
-              <div className="flex justify-between items-center mb-2">
-                <button>{'<'}</button>
-                <div className="text-sm font-semibold">September, 2024</div>
-                <button>{'>'}</button>
-              </div>
-              <div className="grid grid-cols-7 gap-1 text-xs text-center">
-                {['S','M','T','W','T','F','S'].map((d) => <div key={d} className="font-bold text-gray-600">{d}</div>)}
-                {Array.from({ length: 30 }, (_, i) => (
-                  <div
-                    key={i + 1}
-                    className={`p-1 rounded-full ${i + 1 === 8 ? 'bg-[#4D007D] text-white' : ''}`}
-                  >
-                    {i + 1}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold mb-2 text-[#4D007D]">Approved Leaves</h4>
-              <div className="flex items-center space-x-3">
-                <img src={leaves[0].image} alt="" className="w-8 h-8 rounded-full" />
-                <div>
-                  <div className="text-sm font-medium">{leaves[0].name}</div>
-                  <div className="text-xs text-gray-500">{leaves[0].date}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-      </div>
+      {isAddLeaveOpen && (
+        <AddLeaves
+          isOpen={isAddLeaveOpen}
+          onClose={handleCloseAddLeave}
+          employees={employees}
+        />
+      )}
     </div>
   );
 };
 
-export default LeaveManagement;
+export default Leaves;

@@ -1,147 +1,172 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FaSearch, FaChevronDown, FaEllipsisV } from 'react-icons/fa';
+import EditEmployee from './EditEmployee';
+import '../style/pages.css';
+import { fetchEmployees,deleteEmployee } from '../features/employeeSlice';
 
 const Employees = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [actionMenuOpen, setActionMenuOpen] = useState(null);
+  const [positionFilter, setPositionFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const dispatch = useDispatch();
+  const { employees, status, error } = useSelector((state) => state.employees);
+
+  useEffect(() => {
+    dispatch(fetchEmployees());
+  }, [dispatch]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setSelectedEmployee(null);
   };
 
   const toggleActionMenu = (id) => {
-    setActionMenuOpen(prev => (prev === id ? null : id));
+    setActionMenuOpen((prev) => (prev === id ? null : id));
   };
 
-  const candidates = [
-    {
-      id: 1,
-      name: "Jacob William",
-      email: "jacob.william@example.com",
-      phone: "(252) 555-0111",
-      position: "Senior Developer",
-      department: "Engineering",
-      dateOfJoining: "2023-08-01",
-      profile: "https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    {
-      id: 2,
-      name: "Guy Hawkins",
-      email: "kenzi.lawson@example.com",
-      phone: "(907) 555-0101",
-      position: "HR Manager",
-      department: "Human Resources",
-      dateOfJoining: "2023-09-15",
-      profile: "https://randomuser.me/api/portraits/men/44.jpg"
-    },
-    {
-      id: 3,
-      name: "Arlene McCoy",
-      email: "arlene.mccoy@example.com",
-      phone: "(302) 555-0107",
-      position: "UI/UX Designer",
-      department: "Design",
-      dateOfJoining: "2023-06-10",
-      profile: "https://randomuser.me/api/portraits/women/25.jpg"
-    },
-    {
-      id: 4,
-      name: "Leslie Alexander",
-      email: "willie.jennings@example.com",
-      phone: "(207) 555-0119",
-      position: "Frontend Developer",
-      department: "Engineering",
-      dateOfJoining: "2022-11-25",
-      profile: "https://randomuser.me/api/portraits/women/68.jpg"
-    },
-  ];
+  const handleEditEmployee = (employee) => {
+    setSelectedEmployee(employee);
+    setIsModalOpen(true);
+    setActionMenuOpen(null);
+  };
+
+  const handleDeleteEmployee = async (id) => {
+    if (window.confirm('Are you sure you want to delete this employee?')) {
+      try {
+        await dispatch(deleteEmployee(id)).unwrap();
+        setActionMenuOpen(null);
+      } catch (error) {
+        console.error('Failed to delete employee:', error);
+      }
+    }
+  };
+
+  const filteredEmployees = employees.filter((employee) => {
+    const matchesPosition =
+      positionFilter === 'All' || employee.position === positionFilter;
+    const matchesSearch =
+      searchTerm === '' ||
+      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      employee.phone.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesPosition && matchesSearch;
+  });
+
+  if (status === 'loading') {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div className="error">Error: {error}</div>;
+  }
 
   return (
-    <div className="">
-      {/* Filters and Search Bar */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex space-x-4">
-          <div className="relative">
-            <select className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-4 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4d007d] cursor-pointer">
-              <option>Position</option>
-              <option>Senior Developer</option>
-              <option>HR Manager</option>
-              <option>UI/UX Designer</option>
-              <option>Frontend Developer</option>
+    <div className="employees-container">
+      <div className="filters-container">
+        <div className="filters-group">
+          <div className="select-container">
+            <select
+              value={positionFilter}
+              onChange={(e) => setPositionFilter(e.target.value)}
+              className="select"
+            >
+              <option value="All">Position</option>
+              <option value="Intern">Intern</option>
+              <option value="Full Time">Full Time</option>
+              <option value="Junior">Junior</option>
+              <option value="Senior">Senior</option>
+              <option value="Team Lead">Team Lead</option>
             </select>
-            <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <FaChevronDown className="chevron-icon" />
           </div>
         </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <div className="search-container">
+          <div className="search-wrapper">
+            <FaSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search"
-              className="pl-10 py-2 pr-4 border border-gray-300 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-[#4d007d]"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
             />
           </div>
         </div>
       </div>
 
-      {/* Candidates Table */}
-      <div className="overflow-x-auto border border-gray-200 rounded-md">
-        <table className="min-w-full bg-white">
+      {/* Employees Table */}
+      <div className="table-container">
+        <table className="table">
           <thead>
-            <tr className="bg-[#4d007d] text-white text-left">
-              <th className="py-3 px-4">Profile</th>
-              <th className="py-3 px-4">Candidates Name</th>
-              <th className="py-3 px-4">Email Address</th>
-              <th className="py-3 px-4">Phone Number</th>
-              <th className="py-3 px-4">Position</th>
-              <th className="py-3 px-4">Department</th>
-              <th className="py-3 px-4">Date of Joining</th>
-              <th className="py-3 px-4">Action</th>
+            <tr>
+              <th>Profile</th>
+              <th>Candidates Name</th>
+              <th>Email Address</th>
+              <th>Phone Number</th>
+              <th>Position</th>
+              <th>Department</th>
+              <th>Date of Joining</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {candidates.map((candidate) => (
-              <tr key={candidate.id} className="border-t border-gray-200">
-                <td className="py-4 px-4">
+            {filteredEmployees.map((employee) => (
+              <tr key={employee._id}>
+                <td>
                   <img
-                    src={candidate.profile}
-                    alt={candidate.name}
-                    className="w-10 h-10 rounded-full object-cover"
+                    src={employee.profileImage || 'https://randomuser.me/api/portraits/men/32.jpg'}
+                    alt={employee.name}
+                    className="profile-image"
                   />
                 </td>
-                <td className="py-4 px-4">{candidate.name}</td>
-                <td className="py-4 px-4">{candidate.email}</td>
-                <td className="py-4 px-4">{candidate.phone}</td>
-                <td className="py-4 px-4">{candidate.position}</td>
-                <td className="py-4 px-4">{candidate.department}</td>
-                <td className="py-4 px-4">{candidate.dateOfJoining}</td>
-                <td className="py-4 px-4 relative">
-                  <button
-                    onClick={() => toggleActionMenu(candidate.id)}
-                    className="text-gray-600 hover:text-gray-800"
-                  >
-                    <FaEllipsisV />
-                  </button>
-
-                  {actionMenuOpen === candidate.id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                      <div className="py-1">
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Edit Candidate
-                        </button>
-                        <button className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                          Delete Candidate
-                        </button>
+                <td>{employee.name}</td>
+                <td>{employee.email}</td>
+                <td>{employee.phone}</td>
+                <td>{employee.position}</td>
+                <td>{employee.department || 'N/A'}</td>
+                <td>
+                  {new Date(employee.dateOfJoining).toLocaleDateString()}
+                </td>
+                <td>
+                  <div className="action-container">
+                    <button
+                      onClick={() => toggleActionMenu(employee._id)}
+                      className="action-button"
+                    >
+                      <FaEllipsisV />
+                    </button>
+                    {actionMenuOpen === employee._id && (
+                      <div className="action-menu">
+                        <div>
+                          <button
+                            onClick={() => handleEditEmployee(employee)}
+                          >
+                            Edit Employee
+                          </button>
+                          <button
+                            onClick={() => handleDeleteEmployee(employee._id)}
+                          >
+                            Delete Employee
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <EditEmployee
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        employee={selectedEmployee}
+      />
     </div>
   );
 };

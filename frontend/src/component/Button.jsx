@@ -1,16 +1,18 @@
 import React from "react";
 
 const buttonStyle = {
-  padding: '0.375rem 2.5rem',
+  width: '150px', 
+  padding: '0.5rem 1rem',
   backgroundColor: '#4D007D',
   color: 'white',
   borderRadius: '9999px',
-  fontSize: '1.25rem',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  fontSize: '1rem',
+  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   transition: 'background-color 0.3s ease',
   cursor: 'pointer',
   outline: 'none',
   border: 'none',
+  textAlign: 'center',
 };
 
 const Button = ({ children, onClick, type = "button", className = "" }) => {
@@ -20,7 +22,7 @@ const Button = ({ children, onClick, type = "button", className = "" }) => {
       onClick={onClick}
       style={{
         ...buttonStyle,
-        ...(className && {}), // You can add additional styles via className if needed
+        ...(className && {}), 
       }}
       onMouseOver={(e) => (e.target.style.backgroundColor = '#6B21A8')}
       onMouseOut={(e) => (e.target.style.backgroundColor = '#4D007D')}

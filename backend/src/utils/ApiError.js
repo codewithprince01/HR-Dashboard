@@ -1,4 +1,4 @@
-// utils/ApiError.js
+
 class ApiError extends Error {
     constructor(
       message = "Something went wrong",

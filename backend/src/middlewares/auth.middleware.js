@@ -20,7 +20,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
       throw new ApiError(401, "Invalid access token");
     }
 
-    // Check if token is expired
+ 
     const now = Date.now() / 1000;
     if (decoded.exp < now) {
       throw new jwt.TokenExpiredError("Token expired", new Date(decoded.exp * 1000));
@@ -38,7 +38,7 @@ const verifyJWT = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Middleware to check inactive sessions
+
 const checkInactivity = asyncHandler(async (req, res, next) => {
   const user = req.user;
   const now = new Date();

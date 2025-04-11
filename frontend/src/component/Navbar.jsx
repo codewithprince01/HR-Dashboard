@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { FaEnvelope, FaBell, FaChevronDown } from "react-icons/fa";
 
-// Map routes to dynamic page titles
+
 const pathTitleMap = {
   "/candidates": "Candidates",
   "/employees": "Employees",
@@ -17,7 +17,6 @@ const navbarStyle = {
   left: '16rem',
   right: 0,
   backgroundColor: 'white',
-  borderBottom: '1px solid #E5E7EB',
   zIndex: 10,
   height: '3.5rem',
   display: 'flex',
@@ -90,7 +89,6 @@ const Navbar = () => {
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Get the dynamic title based on path
   const pageTitle = pathTitleMap[location.pathname] || "Dashboard";
 
   return (
